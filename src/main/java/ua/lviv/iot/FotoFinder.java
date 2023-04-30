@@ -10,7 +10,10 @@ import java.util.regex.Pattern;
 
 public class FotoFinder {
 
-    public String fider(String text, String pattern) throws IOException {
+    public String finder(final String text){
+
+        String pattern = "\\b\\w+\\.(png|jpe?g|gif)\\b";
+
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(text);
         List<String> results = new ArrayList<>();
@@ -23,31 +26,21 @@ public class FotoFinder {
     }
 
 
-
-
     public static void main(String[] args) throws IOException {
+        InputStreamReader r = new InputStreamReader(System.in);
+        BufferedReader br = new BufferedReader(r);
 
 
-        InputStreamReader r=new InputStreamReader(System.in);
-        BufferedReader br=new BufferedReader(r);
         System.out.println("Enter your text: ");
-        String text =br.readLine();
+        String text = br.readLine();
+
 
         //Photos from our walk are in the file walk.png. Photos from the trip to the Carpathians are in the file trip.jpeg;
         String pattern = "\\b\\w+\\.(png|jpe?g|gif)\\b";
 
         FotoFinder fotoFinder = new FotoFinder();
-        String found = fotoFinder.fider(text, pattern);
+        String found = fotoFinder.finder(text);
         System.out.println(found);
-
-//        List<String> results = fotoFinder.fider(text, pattern);
-//
-//        for (String result : found) {
-//            System.out.println(result);
-//        }
-
-
-
 
     }
 }
