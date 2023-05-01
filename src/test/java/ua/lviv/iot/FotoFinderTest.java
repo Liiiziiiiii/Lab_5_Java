@@ -1,49 +1,38 @@
 package ua.lviv.iot;
 
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 
-import java.io.IOException;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 
 public class FotoFinderTest {
 
-    @Test
-    public void testPostalCode() {
-        String text = "Photos from our walk are in the file walk.png. Photos from the trip to the Carpathians are in the file trip.jpeg";
-        Pattern pattern = Pattern.compile("\\b\\w+\\.(png|jpe?g|gif)\\b");
-        Matcher matcher = pattern.matcher(text);
-        List<String> expectedFoto = Arrays.asList("walk.png", "trip.jpeg");
-        List<String> actualFoto = new ArrayList<>();
-        while (matcher.find()) {
-            actualFoto.add(matcher.group());
-        }
-        assertEquals(expectedFoto, actualFoto);
+    @ParameterizedTest
+    @MethodSource("provideParameters")
+    public void testPostalCode(String input, List<String> expected) {
+        FotoFinder fotoFinder = new FotoFinder();
+        assertEquals(expected, fotoFinder.finder(input));
     }
-
-    @Test
-    public void testNoFotoFinder() {
-        String text = "Photos from our walk are in the file walk";
-        Pattern pattern = Pattern.compile("\\b\\w+\\.(png|jpe?g|gif)\\b");
-        Matcher matcher = pattern.matcher(text);
-        assertFalse(matcher.find());
+    private static Stream<Arguments> provideParameters(){
+        return Stream.of(
+        Arguments.of("Photos from our walk are in the file walk.png. " +
+                "Photos from the trip to the Carpathians are in the file trip.jpeg",Arrays.asList("walk.png.", "trip.jpeg")),
+               Arguments.of("Photos from our walk are in the file walk",new ArrayList<>()),
+               Arguments.of("Photos from our walk are in the file walk.pngp",new ArrayList<>()),
+               Arguments.of("miwaphoto is gh_ft.png",Arrays.asList("gh_ft.png")),
+               Arguments.of("",new ArrayList<>()),
+               Arguments.of("miwa_g.pnghfefe.png",Arrays.asList("miwa_g.pnghfefe.png")),
+                Arguments.of("miwa_g.png hfefe.png",Arrays.asList("miwa_g.png ", "hfefe.png"))
+    );
     }
-
-     @Test
-    public void testInvalidFotoFinderFormat() {
-        String text = "Photos from our walk are in the file walk.pngp";
-        Pattern pattern = Pattern.compile("\\b\\w+\\.png\\b");
-        Matcher matcher = pattern.matcher(text);
-        assertFalse(matcher.find());
-    }
-
 }
